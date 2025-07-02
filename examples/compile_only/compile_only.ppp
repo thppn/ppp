@@ -1,0 +1,133 @@
+class Vehicle :
+
+    int x1, y1;;
+
+    def __init__(self): Vehicle
+    ;;
+
+    def startVehicle(self, int velocity): int
+        x1 = 5;
+        return 5
+    ;;
+
+    def stopVehicle(self): -
+    ;;
+    
+
+
+
+class Flying :
+    int x2, y2;;
+    def __init__(self): Flying
+    ;;
+    def fly(self): int
+        return 5
+    ;;
+class Airplane inherits Vehicle, Flying :
+
+    int x;
+    Vehicle v1, v2, v3;;
+
+    def __init__(self): Airplane
+        $Vehicle();
+        $Flying();
+        x = 2
+    ;;
+
+    def lowAltitude(self, int alt): -
+        int xz, xy;
+        self.x1 = 5;
+        $Vehicle(v1);
+        $Vehicle(v2);
+        v1.startVehicle(51);
+        v2.startVehicle(61);
+        while(5 < 4):
+            if (3 > 2):
+                print 1;
+            else:
+                input x2;
+            endif
+        endwhile
+    ;;
+
+    def highAltitude(self, int alt): -
+        lowAltitude(5);
+        fly();
+        x = self.v3.startVehicle(5)
+    ;;
+
+class Car inherits Vehicle :
+    int x3, y3;
+    int doors,n;
+    Airplane vx;;
+    def __init__(self, Vehicle a): Car
+        $Vehicle()
+    ;;
+
+    def makeHorn(self): -
+    ;;
+class Jeep inherits Car:
+    int x8, x9;
+    ;
+    def __init__(self): Jeep
+        self.x1 = 5
+    ;;
+    def jeepemall(self, int x0): int
+        x8 = 5;
+        return x8
+    ;;
+    def testest(self): int
+        self.x8 = jeepemall(5);
+        $Airplane(vx);
+        x9 = self.startVehicle(vx.startVehicle(4)+(jeepemall(vx.fly())*3));
+        return x8
+    ;;
+
+class Motorcycle inherits Vehicle :
+
+    def __init__(self): Motorcycle
+    ;;
+
+    def makeSouza(self, int time, int height): -
+        int x4, y4;
+        x4 = 2;
+        y4 = 1
+    ;;
+    def testlast(self, Car c): -
+ 	  int x5;
+        x5 = 1
+    ;;
+
+
+
+class Main :
+
+    Jeep v1;
+    Vehicle v2;
+    Motorcycle m1;
+    Airplane a1;
+    int x,y 
+    ;;
+
+    def main(self): - 
+
+        $Jeep(v1);
+        $Vehicle(v2);
+        $Motorcycle(m1);
+        $Airplane(a1);
+        v1.startVehicle(5);
+        v2.startVehicle(6);
+        x = v1.startVehicle(3);
+        y = x;
+        while(5 < 9):
+            if (3 > 2):
+                print 1;
+            else:
+                input x;
+            endif
+        endwhile;
+        m1.testlast(v1);
+        m1.startVehicle(4);
+	    m1.makeSouza(10, 4)
+    ;;
+

@@ -1,0 +1,100 @@
+class Employee:
+    int id, works;;
+
+    def __init__(self, int id): Employee
+        self.id = id;
+        self.works = 0
+    ;;
+
+    def startWork(self): -
+        self.works = 1
+    ;;
+
+    def stopWork(self): -
+        self.works = 0
+    ;;
+
+    def getID(self): int
+        return id
+    ;;
+
+class Bank:
+    Employee e1, e2, e3, e4;
+    int id
+    ;;
+
+    def __init__(self, int id): Bank
+        self.id = id
+    ;;
+
+    def showWorkingEmployee(self): -
+        int in;
+        in = -1;
+        while(in != 0):
+            if(in == 1):
+                print e1.getID();
+            endif;
+            if(in == 2):
+                print e2.getID();
+            endif;
+            if(in == 3):
+                print e3.getID();
+            endif;
+            if(in == 4):
+                print e4.getID();
+            endif;
+            input in
+        endwhile
+    ;;
+
+class Department inherits Bank:
+    int dept_id;;
+    def __init__(self, int bank_id, int dept_id): Department
+        $Bank(bank_id);
+        self.dept_id = dept_id
+    ;;
+
+class Teller inherits Employee:
+
+    int teller_id;
+    Department dept;;
+    def __init__(self, int id, int teller_id, Department dept): Teller
+        $Employee(id);
+        self.id = id;
+        self.teller_id = teller_id;
+        self.dept = dept
+    ;;
+
+class Economic inherits Department:
+    Teller economicDepartmentTeller;;
+
+    def __init__(self, int bank_id, int dept_id, Teller deptTeller): Economic
+        $Department(1, 2);
+        self.id = bank_id;
+        self.dept_id = dept_id;
+        economicDepartmentTeller = deptTeller
+    ;;
+
+class Security inherits Employee:
+
+    int security_id;
+    Department dept;;
+    def __init__(self, int id, int security_id, Department dept): Security
+	  $Employee(id);
+        self.security_id = security_id;
+        self.dept = dept
+    ;;
+
+class Main:
+    Bank b1;
+    Teller t1, t2;
+    Security s1;
+    Economic ec1
+    ;;
+
+
+    def main(self): -
+        $Bank(b1, 1);
+        $Teller(t1, 1, 2, ec1)
+    ;;
+

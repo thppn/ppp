@@ -1,0 +1,22 @@
+class Fibonacci:
+    int x;;
+    def __init__(self): Fibonacci
+    ;;
+    def fib(self, int n): int
+        if(n <= 1):
+            return 1;
+        endif;
+        return self.fib(n-1) + self.fib(n-2)
+    ;;
+class Main:
+    int x, y ;
+    Fibonacci f
+    ;;
+
+    def main(self): -
+        $Fibonacci(f);
+        input x;
+        y = f.fib(x);
+        print y
+
+    ;;
