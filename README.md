@@ -2,7 +2,7 @@
 
 
 
-For the purpose of Compilers II lesson in the Computer Science and Engineering Department at University of Ioannina ppp was developed as an OOP language compiling to C code. In this repository the compiler is refactored from scratch according to the initial requirements.
+For the purpose of Compilers II lesson in the CSE Dept @ University of Ioannina `ppp` was developed as an OOP language compiling to C code. In this repository the project is refactored from scratch according to the initial requirements.
 
 
 
