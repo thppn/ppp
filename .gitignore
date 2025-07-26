@@ -1,0 +1,7 @@
+__pycache__/
+venv/
+grammar/
+.antlr/
+antlr/
+output.c
+symbols.json

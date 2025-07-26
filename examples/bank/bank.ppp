@@ -15,7 +15,7 @@ class Employee:
     ;;
 
     def getID(self): int
-        return id
+        return self.id
     ;;
 
 class Bank:
@@ -31,48 +31,49 @@ class Bank:
         int in;
         in = -1;
         while(in != 0):
-            if(in == 1):
-                print e1.getID();
+            if(in == 1 or in > 1):
+                print self.e1.getID();
             endif;
             if(in == 2):
-                print e2.getID();
+                print self.e2.getID();
             endif;
             if(in == 3):
-                print e3.getID();
+                print self.e3.getID();
             endif;
             if(in == 4):
-                print e4.getID();
+                print self.e4.getID();
             endif;
-            input in
+            input self.id
         endwhile
     ;;
 
 class Department inherits Bank:
     int dept_id;;
     def __init__(self, int bank_id, int dept_id): Department
-        $Bank(bank_id);
+        self.id = bank_id;
         self.dept_id = dept_id
     ;;
 
 class Teller inherits Employee:
 
     int teller_id;
-    Department dept;;
-    def __init__(self, int id, int teller_id, Department dept): Teller
-        $Employee(id);
+    Bank bank;;
+    def __init__(self, int id, int teller_id, Bank bank): Teller
         self.id = id;
+        input self.id;
         self.teller_id = teller_id;
-        self.dept = dept
+        self.bank = bank
     ;;
 
 class Economic inherits Department:
     Teller economicDepartmentTeller;;
 
     def __init__(self, int bank_id, int dept_id, Teller deptTeller): Economic
-        $Department(1, 2);
+        Department dept;
+        $Department(dept, 1, 2);
         self.id = bank_id;
         self.dept_id = dept_id;
-        economicDepartmentTeller = deptTeller
+        self.economicDepartmentTeller = deptTeller
     ;;
 
 class Security inherits Employee:
@@ -80,7 +81,7 @@ class Security inherits Employee:
     int security_id;
     Department dept;;
     def __init__(self, int id, int security_id, Department dept): Security
-	  $Employee(id);
+	    self.id = id;
         self.security_id = security_id;
         self.dept = dept
     ;;
@@ -89,12 +90,16 @@ class Main:
     Bank b1;
     Teller t1, t2;
     Security s1;
-    Economic ec1
+    Economic ec1;
+    int z
     ;;
 
-
     def main(self): -
-        $Bank(b1, 1);
-        $Teller(t1, 1, 2, ec1)
+        int x96;
+        x96 = 1;
+        self.z = 2;
+        $Bank(self.b1, 1);
+        $Teller(self.t1, x96, 2+(3), self.b1);
+        print self.t1.getID()
     ;;
 

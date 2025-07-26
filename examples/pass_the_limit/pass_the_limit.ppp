@@ -1,12 +1,12 @@
 class Main:
     int x, y, z;;
     def main(self): -
-        z = 3+5+8*9;
-        input y;
-        input x;
-        while(x < y):
+        self.z = 3+5+8*9;
+        input self.y;
+        input self.x;
+        while(self.x < self.y):
             print(0);
-            input x
+            input self.x
         endwhile;
         print(1)
     ;;

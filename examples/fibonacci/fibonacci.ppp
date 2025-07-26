@@ -1,12 +1,12 @@
 class Fibonacci:
     int x;;
-    def __init__(self): Fibonacci
-    ;;
+    def __init__(self): Fibonacci;;
+
     def fib(self, int n): int
         if(n <= 1):
-            return 1;
+            return n;
         endif;
-        return self.fib(n-1) + self.fib(n-2)
+        return fib(n-1) + fib(n-2)
     ;;
 class Main:
     int x, y ;
@@ -14,9 +14,8 @@ class Main:
     ;;
 
     def main(self): -
-        $Fibonacci(f);
-        input x;
-        y = f.fib(x);
-        print y
-
+        $Fibonacci(self.f);
+        input self.x;
+        self.y = self.f.fib(self.x);
+        print self.y
     ;;

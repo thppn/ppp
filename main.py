@@ -1,8 +1,7 @@
 import sys
-
 from antlr4 import *
-from pppLexer import pppLexer
-from pppParser import pppParser
+from grammar.pppLexer import pppLexer
+from grammar.pppParser import pppParser
 from ppp import ppp
 
 def main(argv):
@@ -11,13 +10,8 @@ def main(argv):
     stream = CommonTokenStream(lexer)
     parser = pppParser(stream)
     tree = parser.startRule()
-
-    pppListener = ppp(argv[2])
-    #pppListener.cc = '/usr/bin/gcc'
-    
     walker = ParseTreeWalker()
-    walker.walk(pppListener, tree)
-
+    walker.walk(ppp(), tree)
 
 if __name__ == '__main__':
     main(sys.argv)

@@ -1,142 +1,57 @@
 grammar ppp;
 
 @parser::members {
+symbols = {}
+scope = []
 
-table = {}
-inherit = {}
-stack = []
+def add_scope(self, current, parents):
+    self.scope += [current]
+    self.symbols[current] = [{}, {}, parents]
 
-def addScope(self, scope):
- self.stack.append(scope)
- if scope not in self.table.keys():
-  self.table[scope] = {}
+def add_func(self, func, type='-'):
+    c = self.scope[0]
+    m = f'{func}@{c}'
+    self.symbols[c][1][func] = type, self.symbols[m][1]
+        
+def add_par(self, type, var):
+    self.add_var(type, var)
+    c = self.scope[-1]
+    self.symbols[c][1][var] = type
+        
+def add_var(self, type, var):
+	scope = self.scope[-1]
+	self.symbols[scope][0][var] = type
 
-def findScope(self, entityName, scopePath:list):
- currentScope = scopePath[-1]
- if entityName in self.table[currentScope].keys():
-  return scopePath, self.table[currentScope][entityName]
- for upperScope in self.inherit[currentScope]:
-  entity = self.findScope(entityName, scopePath+[upperScope])
-  if entity is not None: return entity
-
-def searchInherit(self, parameterClass , argumentClassList):
- if parameterClass in argumentClassList:
-   return [parameterClass]
- for argumentClass in argumentClassList:
-   upperClassList = self.inherit[argumentClass]
-   for upperClass in upperClassList:
-     return [upperClass] + self.searchInherit(parameterClass, self.inherit[upperClass])  
- return []
-
-
-def checkArguments(self, parameterType, argumentType , argument):
-  if len(parameterType) != len(argumentType):
-    self.error('', '',self.stack[-1]+' wrong arguments')
-  for i in range(0, len(parameterType)):
-    if parameterType[i] != argumentType[i]:
-      if (self.inherit[argumentType[i]]):
-        argumentClassPathList = self.searchInherit(parameterType[i], [argumentType[i]])
-        if argumentClassPathList[-1] == parameterType[i]:
-          argument[i] = [argument[i]] + argumentClassPathList
-        else:
-          self.error('', argumentType[i], parameterType[i]+' was expected')
-      else:
-        self.error('', argumentType[i], parameterType[i]+' was expected')
-  return argument
-
-def getVariable(self, variableName):
-  variableEntity=self.findScope(variableName, [self.stack[-1]])
-  if not variableEntity: 
-        return (False, 'not in scope')
-  variableClassPathList, variableType = variableEntity
-  variableClassPath = ['$'+upperClass for upperClass in variableClassPathList[2:]]                    
-  variableList=variableClassPath+[variableName]
-  if len(variableClassPathList) > 1 and variableClassPathList[1] != 'main':
-        variableList = ['self']+variableList
-  return (variableList, variableEntity)
-
-def getFunction(self, functionName, parameterType:list, argumentList:list, currentScope:list, d=2):
-  functionEntity=self.findScope(functionName, currentScope)
-  if not functionEntity: 
-        return (False,'not in currentScope', None)
-  functionClassPathList,functionType = functionEntity
-  self.checkArguments(functionType[1:-1], parameterType, argumentList)
-  pppFunctionName=functionName+'$'+functionClassPathList[-1]
-  functionClassPath = ['$'+upperClass for upperClass in functionClassPathList[d:]]
-  if len(functionClassPathList) > 1 and functionClassPathList[1] != 'main': 
-    functionClassPath = ['self'] +functionClassPath
-  return (pppFunctionName, [functionClassPath], functionEntity)
-
-def getDFunction(self, variableName, functionName, functionType:list, argument:list):
-  variableList, variableEntity = self.getVariable(variableName)
-  variableClassPathList, variableType = variableEntity
-
-  pppFunctionName, functionClassPath, functionEntity = self.getFunction(functionName, functionType, argument, [variableType], 1)
-  functionClassPathList, functionType = functionEntity
-  
-  functionClassPath2 = ['$'+upperClass for upperClass in functionClassPathList[1:]]
-  variableClassPath = ['$'+upperClass for upperClass in variableClassPathList[2:]]
- 
-  dFunctionClassPath=[variableClassPath+[variableName]+functionClassPath2]+argument
-
-  if len(variableClassPathList) > 1 and variableClassPathList[1] != 'main': 
-    dFunctionClassPath[0] = ['self'] +dFunctionClassPath[0]
-  
-  return (pppFunctionName, dFunctionClassPath, functionEntity)
-
-def error(self, line, token, message):
- print(str(line)+': '+token+' '+message)
- quit()
-
-def printTable(self):
- for pppClass in self.table:
-  print('\nScope: '+pppClass)
-  for pppSymbol in self.table[pppClass]:
-   print(variable,self.table[pppClass][pppSymbol])
-
-def printInherit(self):
- for pppClass in self.inherit:
-  print('\nClass: '+pppClass)
-  for pppParentClass in self.inherit[pppClass]:
-   print(pppParentClass)
-
+def save_symbols(self):
+    import json
+    with open("symbols.json", "w") as f:
+        json.dump(self.symbols, f, indent=2)
 
 }
-
 startRule
-        :   classes 
+        :   classes {self.save_symbols()}
         ;
 
 classes
-        :   class_def*
-            class_main_def 
+        :   class_def* 
+            class_main_def
             EOF
         ;
 
-class_def returns [list upperClasses]
-        :       'class' className=class_name
-                                        {self.addScope($class_name.text)}
-                                        {$upperClasses=[]}
-
-                ( 'inherits' class_name 
-                                        {$upperClasses.append($class_name.text)}
-                (',' class_name         
-                                        {$upperClasses.append($class_name.text)} 
-                )*  )? ':' 
-                (declarations ';'';' )?
-                                        {self.inherit[self.stack[-1]] = $upperClasses}
-                class_body
-                                        {self.stack.pop()}
+class_def
+        :   'class' current=class_name {p=[]}('inherits' class_name {p=[$class_name.text]} (',' class_name {p.append($class_name.text)} )*  )? ':'
+                {self.add_scope($current.text, p or [])}
+            (declarations ';'';')?
+            class_body
+                {self.scope.pop()}
         ;
 
 class_main_def
-        :   'class' ('main' | 'Main') ':' 
-                                        {self.table['main'] = {}} 
-                                        {self.addScope('main')}
-                                        {self.inherit[self.stack[-1]] = []}
+        :   'class' ('main' | 'Main') ':'
+                {self.add_scope("_main", [])}
             (declarations ';'';')?
             main_body
-            
+                {self.scope.pop()}
         ;
 
 class_name
@@ -144,53 +59,39 @@ class_name
         ;
 
 declarations
-        :       decl_line (';' decl_line)* 
+        :   decl_line  (';' decl_line )*
         ;
 
 class_body
-        :       ( constructor_def ';'';' )+( method_def ';'';')*
+        :   (constructor_def ';'';')+
+            (method_def ';'';')*
         ;
 
 main_body
         :   method_main_def ';'';'
         ;
 
-decl_line returns [list varList]
-        :       varType=types ID                
-                                        {self.table[self.stack[-1]][$ID.text] = $types.text}
-                                        {$varList=[$ID.text]}
-                (',' ID                 {self.table[self.stack[-1]][$ID.text] = $types.text}
-                                        {$varList+=[$ID.text]} 
-                )*
+decl_line
+        :   types ID  {self.add_var($types.text, $ID.text)} (',' ID  {self.add_var($types.text, $ID.text)} )*
         ;
 
-constructor_def returns [string pppConstructor]
-        :       'def' '__init__'        {$pppConstructor="__init__@"+self.stack[-1]} {self.addScope($pppConstructor)}
-                parameters ':' class_name
-                                        {self.table[self.stack[-2]]['__init__'] = [self.stack[-2]]+$parameters.parameterType+[$class_name.text]}
-                                        {self.inherit[self.stack[-1]] = [self.stack[-2]]}
-                method_body
-                                        {self.stack.pop()}
+constructor_def
+        :   'def' '__init__' {self.add_scope(f'__{self.scope[0]}__@{self.scope[0]}', [self.scope[0]])} 
+            {self.add_par(self.scope[0], 'self');}
+            parameters ':' class_name
+            {self.add_func('__%s__' % self.scope[0])}
+            method_body
         ;
 
-method_def returns [string pppMethod]
-        :       'def' ID                {$pppMethod=$ID.text+"@"+self.stack[-1]} {self.addScope($pppMethod)}       
-                parameters ':' return_type
-                                        
-                                        {self.table[self.stack[-2]][$ID.text] = [self.stack[-2]]+$parameters.parameterType+[$return_type.text]}
-                                        {self.inherit[self.stack[-1]] = [self.stack[-2]]}
-                method_body
-                                        {self.stack.pop()}
+method_def
+        :   'def' ID {self.add_scope("%s@%s" % ($ID.text,self.scope[0]), [self.scope[0]])} parameters ':' 
+            (types {self.add_func($ID.text, $types.text)} | '-' {self.add_func($ID.text)} )
+            method_body
         ;
 
-method_main_def returns [string mainMethod]
-        :       'def' 'main' '(' 'self' ')' ':' '-'
-                                        {mainMethod=self.stack[-1]+"@main"} {self.addScope(mainMethod)}
-
-                                        {self.table[self.stack[-2]]['main'] = ['self','-']}
-                                        {self.inherit[self.stack[-1]] = [self.stack[-2]]}
-                method_body
-                                        {self.stack.pop()}
+method_main_def
+        :   'def' 'main' {self.add_scope('main@_main', [self.scope[0]])} '(' 'self' ')' ':' '-' {self.add_func("main")}
+            method_body
         ;
 
 types
@@ -198,112 +99,91 @@ types
         |   'int'
         ;
 
-parameters returns [string parameterString, list parameterType]
-        :   '(' parlist ')'             {$parameterString='('+$parlist.parlistString+')'} {$parameterType=$parlist.parlistType} 
+parameters
+        :   '(' parlist ')'
         ;
 
 method_body
-        :       (declarations ';')? 
-                (statements)?
+        :   (declarations ';')? 
+            (statements)?   {self.scope.pop()}
         ;
 
 return_type
-        :   types        
-        |   '-'                    
+        :   types
+        |   '-'
         ;
 
-parlist returns [string parlistString, list parlistType, list parameterList]
-        :       'self'                  {$parlistString,$parlistType,$parameterList='self',[],[]}
-                (',' types ID           {$parlistString+=', '+$types.text+' '+$ID.text} {$parlistType.append($types.text)} {$parameterList.append($ID.text)}
-                                        {self.table[self.stack[-1]][$ID.text] = $types.text}
-                )*
+parlist 
+        :   'self' //eeeeedw
+            (',' types ID {self.add_par($types.text, $ID.text);} )*
         ;
 
-statements
-        :       statement (';' statement)*
+statements :   statement (';' statement )*
         ;
+
 
 statement
-        :   assignment_stat             
-        |   direct_call_stat             
-        |   if_stat            
-        |   while_stat    
-        |   return_stat    
-        |   input_stat      
-        |   print_stat       
+        :   assignment_stat
+        |   direct_call_stat
+        |   if_stat
+        |   while_stat
+        |   return_stat
+        |   input_stat
+        |   print_stat
         ;
 
-assignment_stat returns [list idList, list exprList]
-        :   ('self.')? ID '='
-                                        {$idList, idEntity=self.getVariable($ID.text)}
-                                        {if not $idList: self.error($ID.line, $ID.text, idEntity)}
-                 expression             {$exprList=[$expression.exprString]} 
-        |  constructor_call           
-                                        {argumentList = $constructor_call.argumentList}
-                                        {argumentTypeList = $constructor_call.argumentTypeList}
-                                        {if not self.stack[-1].split('@')[0] == '__init__': argumentTypeList = argumentTypeList[1:]}
-                                        {if self.stack[-1] == 'main@main': argumentList = argumentList[1:]}
-                                        {constructorEntity = self.getFunction('__init__', argumentTypeList, argumentList, [$constructor_call.constructorName])}
-                                        {$exprList=[$constructor_call.constructorName,$constructor_call.argumentTypeList, argumentList]} 
-        ;                               
+assignment_stat 
+        :   ('self.')? ID  '=' expression
+        |   constructor_call
+        ;
 
-
-direct_call_stat returns [string functionName, list functionClassPath]
-        :   ( 'self.')? ID '.' func_call
-                                        {pppFunctionName, classPath, pppEntity = self.getDFunction($ID.text,$func_call.functionName, $func_call.functionArgumentType, $func_call.functionArgument)}
-                                        {if not pppFunctionName: self.error($func_call.start.line,$func_call.functionName,classPath) }
-                                        {$functionName=pppFunctionName}{$functionClassPath=classPath}
-        |   ('self.')? func_call
-                                        {pppFunctionName, classPath, pppEntity=self.getFunction($func_call.functionName, $func_call.functionArgumentType, $func_call.functionArgument, [self.stack[-1]])}
-                                        {if not pppFunctionName: self.error($func_call.start.line,$func_call.functionName,classPath)}
-                                        {$functionName = pppFunctionName}{$functionClassPath=classPath}
+direct_call_stat
+        :   ('self.')? ID '.' func_call 
+        |   ('self.')? func_call 
         ;
 
 if_stat
-        :       'if' '(' condition ')' ':'                
-                (statements ';')?      
-                else_part
-                'endif'
+        :   'if' '(' condition ')' ':'
+            (statements ';' )?
+            else_part
+            'endif'
         ;
 
-else_part returns [int elseFlag]
-        :       'else' ':'    
-                ( statements ';')?              {$elseFlag=1}
-        |                                       {$elseFlag=0}
+else_part
+        :   'else' ':'
+            ( statements ';' )?
+        |
         ;
 
 while_stat
-        :       'while' '(' condition ')' ':'
-                (statements)?
-                'endwhile'
+        :   'while' '(' condition ')' ':'
+            ( statements )?
+            'endwhile'
         ;
 
 return_stat
         :   'return' expression
         ;
 
-input_stat returns [list idList]
-        :   'input'('self.')? ID                {$idList, variableEntity=self.getVariable($ID.text)}
-                                                {if not $idList: self.error($ID.line, $ID.text, variableEntity)}
+input_stat 
+        :   'input' ('self.')? ID
         ;
 
 print_stat
-        :   'print' expression 
+        :   'print' expression
         ;
 
-expression returns [string exprString, string exprType]
-        :       optional_sign term              {$exprString, $exprType=$optional_sign.text+$term.termString, $term.termType} 
-                (add_oper term                  {$exprString+=$add_oper.text+$term.termString}    
-                                                {if $term.termType != $exprType: self.error($term.start.line,$term.text,'different type expected')}
-                )*
+expression
+        :   optional_sign term (add_oper term )*
         ;
 
-arguments returns [list argumentList, list argumentTypeList]
-        :   '(' arglist ')'                     {$argumentList, $argumentTypeList = $arglist.argumentList, $arglist.argumentTypeList} 
+arguments
+        :   '(' arglist ')'
         ;
 
-condition returns [int orCount]
-        :       {$orCount=0} boolterm ({$orCount+=1} 'or' boolterm)*
+condition
+        :   boolterm
+            ('or' boolterm )*
         ;
 
 optional_sign
@@ -311,54 +191,30 @@ optional_sign
         |
         ;
 
-term returns [string termString, string termType]
-        :       factor                          {$termString=$factor.factorString} 
-                                                {$termType=$factor.factorType}
-                ( mul_oper factor               {$termString+=$mul_oper.text+$factor.factorString} 
-                                                {if $factor.factorType != $termType: self.error($factor.start.line,$factor.text,'different type expected')}
-                )*
+term
+        :   factor  ( mul_oper factor )*
         ;
 
 add_oper
-        :   '+' 
-        |   '-'       
+        :   '+'
+        |   '-'
         ;
 
-arglist returns [list argumentList, list argumentTypeList]
-        :                                       {$argumentList, $argumentTypeList=[], []} 
-                argitem                         {$argumentList+=[$argitem.argitemString]}
-                                                {$argumentTypeList+=[$argitem.argitemType]}
-                (',' argitem                    {$argumentList+=[$argitem.argitemString]}
-                                                {$argumentTypeList+=[$argitem.argitemType]} 
-                )*
-        |                                       {$argumentList, $argumentTypeList=[], []} 
+arglist
+        :   argitem (',' argitem )*
+        |
         ;
 
-boolterm returns [int andCount]
-        :       {$andCount=0} boolfactor ({$andCount+=1} 'and' boolfactor)*
+boolterm
+        :   boolfactor ( 'and' boolfactor )*
         ;
 
-factor returns [string factorString, list factorArgument, string factorType, string case]
-        :   {$case=1} integer                             
-                                                {$factorArgument, $factorString, $factorType = [], $integer.text, 'int'}
-        |   {$case=2} '(' expression ')'         
-                                                {$factorArgument, $factorString, $factorType = [], '('+$expression.exprString+')', $expression.exprType}                         
-                                                
-        |   {$case=3} ('self.')? ID
-                                                {$factorArgument, factorEntity=self.getVariable($ID.text)}
-                                                {if not $factorArgument: self.error($ID.line, $ID.text, factorEntity)}
-                                                {$factorString=$factorArgument[0]}{$factorType = factorEntity[1]}
-                                                
-        |   {$case=4} ('self.')? ID '.' func_call
-                                                {$factorString, $factorArgument, factorEntity = self.getDFunction($ID.text,$func_call.functionName, $func_call.functionArgumentType, $func_call.functionArgument)}
-                                                {if not $factorString: self.error($func_call.start.line,$func_call.functionName,$factorArgument) }
-                                                {$factorType = factorEntity[1][-1]}
-
-        |   {$case=5} ('self.')? func_call
-                                                {$factorString, $factorArgument, factorEntity = self.getFunction($func_call.functionName, $func_call.functionArgumentType, $func_call.functionArgument, [self.stack[-1]])}
-                                                {if not $factorString: self.error($func_call.start.line, $func_call.functionName, $factorArgument) }
-                                                {$factorType = factorEntity[1][-1]}
-
+factor
+        :   integer 
+        |   '(' expression ')' 
+        |   ('self.')? ID
+        |   ('self.')? ID '.' func_call
+        |   ('self.')? func_call
         ;
 
 mul_oper
@@ -366,14 +222,14 @@ mul_oper
         |   '/'
         ;
 
-argitem returns [string argitemString, string argitemType]
-        :   expression {$argitemString, $argitemType = $expression.exprString, $expression.exprType}
+argitem
+        :   expression
         ;
 
-boolfactor returns [int boolfactorCase]
-        :   'not' '[' condition ']'             {$boolfactorCase=1}
-        |   '[' condition ']'                   {$boolfactorCase=2}   
-        |   expression rel_oper expression      {$boolfactorCase=3}
+boolfactor
+        :   'not' '[' condition ']'
+        |   '[' condition ']'
+        |   expression rel_oper expression
         ;
 
 integer
@@ -381,14 +237,13 @@ integer
             INTEGER
         ;
 
-func_call returns [string functionName, list functionArgument, list functionArgumentType]
-        :   ID arguments                        
-        {$functionName, $functionArgument, $functionArgumentType = $ID.text, $arguments.argumentList, $arguments.argumentTypeList} 
+func_call
+        :   ID arguments
         ;
 
-constructor_call returns [string constructorName, list argumentList, list argumentTypeList]
-        :   '$'class_name arguments             
-        {$constructorName, $argumentList, $argumentTypeList = $class_name.text, $arguments.argumentList, $arguments.argumentTypeList} 
+constructor_call
+        :   '$'class_name
+            arguments
         ;
 
 rel_oper
