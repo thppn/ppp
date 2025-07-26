@@ -48,16 +48,15 @@ class Main:
 
 ## How to run
 
-### Activate Python environment for ANTLR4 python runtime
 
-`source venv/bin/activate`
+### Download [ANTLR4](https://www.antlr.org/download.html) jar and install python runtime
+
+`pip install antlr4-python3-runtime`
 
 
-
-### Download [ANTLR4](https://www.antlr.org/download.html) runtime jar and compile grammar
+### Compile grammar
 
 `java -jar antlr/antlr-4.13.2-complete.jar -Dlanguage=Python3 -o grammar ./ppp.g4`
-
 
 
 ### Compile ppp example program
