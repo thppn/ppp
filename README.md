@@ -9,39 +9,27 @@ For the purpose of Compilers II lesson in the CSE Dept @ University of Ioannina 
 ### A simple ppp program looks like this 
 
 ```
+class Fibonacci:
+    int x;;
+    def __init__(self): Fibonacci;;
 
-class Fruit:
-    int kg;;
-    def __init__(self, int kg): Fruit
-        self.kg = kg
+    def fib(self, int n): int
+        if(n <= 1):
+            return n;
+        endif;
+        return fib(n-1) + fib(n-2)
     ;;
-
-    def high(self, int kg): -
-        self.kg = self.kg + kg
-    ;;
-
-    def low(self, int kg): -
-        self.kg = self.kg - kg
-    ;;
-
-
-class Apple inherits Fruit:
-    int type;;
-
-    def __init__(self, int type): Apple
-        self.type = type
-    ;;
-
 class Main:
-    int x;
-    Apple y;;
+    int x, y ;
+    Fibonacci f
+    ;;
 
     def main(self): -
-        $Apple(self.y, 4);
-        self.x = 4 + 2 * 7 + 8 * (9 * 3 + 2) + 4 +8;
-        print self.x
+        $Fibonacci(self.f);
+        input self.x;
+        self.y = self.f.fib(self.x);
+        print self.y
     ;;
-
 ```
 
 
@@ -61,7 +49,7 @@ class Main:
 
 ### Compile ppp example program
 
-`python main.py examples/fruits/fruits.ppp`
+`python main.py examples/<program>/<program>.ppp`
 
 
 
