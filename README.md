@@ -68,5 +68,5 @@ class Main:
 
 ## Compile final file and execute
 
-`gcc output.c \&\& ./a.out`
+`gcc output.c && ./a.out`
 
