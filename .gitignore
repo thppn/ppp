@@ -5,3 +5,4 @@ grammar/
 antlr/
 output.c
 symbols.json
+./a.out
