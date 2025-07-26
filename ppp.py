@@ -14,16 +14,16 @@ class ppp(pppListener):
         with open("output.c", "w") as f:
             f.write(self.defs + self.o)
 
-    def get_define(self, name, type):
+    def __get_define(self, name, type):
         self.defs += f'{type} {'$'.join([name, type] + self.scope)};\n'
         for parent in self.symbols[type][2]:
-            self.get_define(name, parent)
+            self.__get_define(name, parent)
 
-    def set_define(self, path, name, type, d=0):
+    def __set_define(self, path, name, type, d=0):
         new_path = f'{path}{f'->${type}' if d else ''}'
         self.o += f'{new_path} = &{'$'.join([name, type] + self.scope)};\n'
         for parent in self.symbols[type][2]:
-            self.set_define(new_path, name, parent, d+1)
+            self.__set_define(new_path, name, parent, d+1)
 
     def __create_structs(self):
         structs = ""
@@ -67,6 +67,10 @@ class ppp(pppListener):
             ret = self.__get_scope(p, scope)
             if ret: return f'${p}->{ret}'
         return None
+
+    def initialize(self, path, name, type):
+        self.__get_define(name, type)
+        self.__set_define(path, name, type)
 
     # returns a variable
     def get_var(self, entry, is_self):
@@ -260,10 +264,9 @@ class ppp(pppListener):
         class_name = ctx.class_name().ID().getText()
         self.set_parlist(f'__{class_name}__', class_name)
         inst, inst_type = ctx.arguments().arglist().getText().split(',')[0], self.parlist[-1]
-        inst_name = inst.split('.')[-1]
+        inst_name  = inst.split('.')[-1]
         inst_path = self.get_var(inst_name, 'self' in inst)[0]
-        self.get_define(inst_name, inst_type)
-        self.set_define(inst_path, inst_name, inst_type)
+        self.initialize(inst_path, inst_name, inst_type)
         self.o+=f"__{class_name}__("
 
     def enterRel_oper(self, ctx):
