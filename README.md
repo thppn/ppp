@@ -6,17 +6,13 @@ For the purpose of Compilers II lesson in the Computer Science and Engineering D
 
 ## How to run
 
-### Activate Python environment for ANTLR4 python runtime
+### Download [ANTLR4](https://www.antlr.org/download.html) and install python runtime
 
-`source venv/bin/activate`
+`pip install antlr4-python3-runtime`
 
-
-
-### Download \[ANTLR4](https://www.antlr.org/download.html) runtime jar and compile grammar
+### Compile ppp grammar
 
 `java -jar antlr/antlr-4.13.2-complete.jar -Dlanguage=Python3 -o grammar ./ppp.g4`
-
-
 
 ### Compile ppp example program
 
