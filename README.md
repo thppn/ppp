@@ -57,3 +57,9 @@ class Main:
 
 `gcc output.c && ./a.out`
 
+## ToDo
+* error messages
+* create more examples
+* all types support
+* arrays
+* Dockerfile
