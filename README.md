@@ -6,25 +6,25 @@ For the purpose of Compilers II lesson in the Computer Science and Engineering D
 
 ## How to run
 
-#Activate Python environment for ANTLR4 python runtime
+### Activate Python environment for ANTLR4 python runtime
 
 `source venv/bin/activate`
 
 
 
-## Download \[ANTLR4](https://www.antlr.org/download.html) runtime jar and compile grammar
+### Download \[ANTLR4](https://www.antlr.org/download.html) runtime jar and compile grammar
 
 `java -jar antlr/antlr-4.13.2-complete.jar -Dlanguage=Python3 -o grammar ./ppp.g4`
 
 
 
-## Compile ppp example program
+### Compile ppp example program
 
 `python main.py examples/fruits/fruits.ppp`
 
 
 
-\## Compile final file and execute
+### Compile final file and execute
 
 `gcc output.c \&\& ./a.out`
 
