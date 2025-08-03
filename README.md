@@ -41,6 +41,9 @@ class Main:
 
 ```bash pip install antlr4-python3-runtime```
 
+### or use the Dockerfile
+
+```docker run -it --rm thppn/antlr4-python:latest```
 
 ### Compile grammar
 
@@ -51,8 +54,6 @@ class Main:
 
 ```bash python main.py examples/<program>/<program>.ppp```
 
-
-
 ## Compile final file and execute
 
 ```bash gcc output.c && ./a.out```
@@ -62,4 +63,3 @@ class Main:
 * create more examples
 * all types support
 * arrays
-* Dockerfile

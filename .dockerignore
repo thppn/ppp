@@ -1,0 +1,10 @@
+venv/
+.antlr/
+antlr/
+output.c
+symbols.json
+a.out
+*.pyc
+__pycache__/
+README.md
+ppp.png
