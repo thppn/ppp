@@ -1,5 +1,6 @@
 # ppp
-
+<!-- https://github.com/thppn/ppp/blob/main/ppp.png?raw=true -->
+<!-- 2022 -->
 
 
 For the purpose of Compilers II lesson in the CSE Dept @ University of Ioannina was developed an OOP language compiling to C code. In this repository the project is refactored from scratch according to the initial requirements.
